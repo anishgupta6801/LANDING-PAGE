@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { submitContactForm, validateContactForm } from '../lib/contactStorage';
+import { submitToNetlifyForms, submitToNetlifyFormsAlt, validateFormData, type ContactFormData } from '../lib/netlifyForms';
+import { FormDebugInfo } from '../components/FormDebugInfo';
 
 export const Help = () => {
   const navigate = useNavigate();
@@ -90,8 +92,8 @@ export const Help = () => {
     e.preventDefault();
     setFormErrors([]);
 
-    // Validate form data before submission
-    const validation = validateContactForm(contactForm);
+    // Validate form data using the new utility
+    const validation = validateFormData(contactForm);
     if (!validation.isValid) {
       setFormErrors(validation.errors);
       toast.error('Please fix the form errors before submitting.');
@@ -101,36 +103,38 @@ export const Help = () => {
     setIsSubmitting(true);
 
     try {
-      // Create FormData for Netlify Forms
-      const formData = new FormData();
-      formData.append('form-name', 'help-contact');
-      formData.append('name', contactForm.name);
-      formData.append('email', contactForm.email);
-      formData.append('subject', contactForm.subject);
-      formData.append('message', contactForm.message);
+      // Try primary submission method
+      console.log('🚀 Attempting form submission...');
+      let result = await submitToNetlifyForms(contactForm);
 
-      // Submit to Netlify
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData as any).toString()
-      });
+      // If primary method fails in production, try alternative method
+      if (!result.success && window.location.hostname !== 'localhost') {
+        console.log('🔄 Primary method failed, trying alternative...');
+        result = await submitToNetlifyFormsAlt(contactForm);
+      }
 
-      if (response.ok) {
-        toast.success('Message sent successfully! We\'ll get back to you soon.');
+      if (result.success) {
+        toast.success(result.message);
         setContactForm({ name: '', email: '', subject: '', message: '' });
         setFormErrors([]);
 
-        // Redirect to thank you page after a short delay
-        setTimeout(() => {
-          window.location.href = '/thank-you.html';
-        }, 1500);
+        // Redirect to thank you page after a short delay (only in production)
+        if (window.location.hostname !== 'localhost') {
+          setTimeout(() => {
+            window.location.href = '/thank-you.html';
+          }, 1500);
+        }
       } else {
-        throw new Error('Form submission failed');
+        console.error('❌ Form submission failed:', result.error);
+        toast.error(result.message);
+        if (result.error) {
+          setFormErrors([result.error]);
+        }
       }
     } catch (error) {
-      console.error('Form submission error:', error);
-      toast.error('Failed to send message. Please try again.');
+      console.error('❌ Unexpected form submission error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+      setFormErrors(['An unexpected error occurred. Please try again.']);
     } finally {
       setIsSubmitting(false);
     }
@@ -345,6 +349,9 @@ export const Help = () => {
                 </form>
               </CardContent>
             </Card>
+
+            {/* Debug Information (only show in development) */}
+            {window.location.hostname === 'localhost' && <FormDebugInfo />}
           </div>
         </div>
       </div>
