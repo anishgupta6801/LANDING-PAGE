@@ -240,7 +240,7 @@ export const LivePreview = () => {
                               className={`relative group ${snapshot.isDragging ? 'z-50' : ''}`}
                             >
                               <div
-                                {...provided.dragHandleProps}
+                                {...(provided.dragHandleProps || {})}
                                 className="absolute top-4 right-4 z-10 bg-primary text-primary-foreground p-2 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-grab"
                               >
                                 <GripVertical className="w-4 h-4" />
