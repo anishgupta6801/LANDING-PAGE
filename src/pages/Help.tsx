@@ -14,22 +14,14 @@ import {
   Search,
   AlertCircle
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { submitContactForm, validateContactForm } from '../lib/contactStorage';
-import { submitToNetlifyForms, submitToNetlifyFormsAlt, submitViaDirectForm, validateFormData, type ContactFormData } from '../lib/netlifyForms';
+
 import { FormDebugInfo } from '../components/FormDebugInfo';
+import { SimpleContactForm } from '../components/SimpleContactForm';
 
 export const Help = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState<string[]>([]);
+
 
   const faqs = [
     {
@@ -88,61 +80,7 @@ export const Help = () => {
     faq.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormErrors([]);
 
-    // Validate form data using the new utility
-    const validation = validateFormData(contactForm);
-    if (!validation.isValid) {
-      setFormErrors(validation.errors);
-      toast.error('Please fix the form errors before submitting.');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Try multiple submission methods in sequence
-      console.log('🚀 Attempting form submission with multiple methods...');
-      let result = await submitToNetlifyForms(contactForm);
-
-      // If primary method fails, try FormData method
-      if (!result.success) {
-        console.log('🔄 Method 1 failed, trying FormData method...');
-        result = await submitToNetlifyFormsAlt(contactForm);
-      }
-
-      // If FormData method fails, try direct form submission
-      if (!result.success) {
-        console.log('🔄 Method 2 failed, trying direct form submission...');
-        result = await submitViaDirectForm(contactForm);
-      }
-
-      if (result.success) {
-        toast.success(result.message);
-        setContactForm({ name: '', email: '', subject: '', message: '' });
-        setFormErrors([]);
-
-        // Redirect to thank you page after a short delay
-        setTimeout(() => {
-          window.location.href = '/thank-you.html';
-        }, 1500);
-      } else {
-        console.error('❌ Form submission failed:', result.error);
-        toast.error(result.message);
-        if (result.error) {
-          setFormErrors([result.error]);
-        }
-      }
-    } catch (error) {
-      console.error('❌ Unexpected form submission error:', error);
-      toast.error('An unexpected error occurred. Please try again.');
-      setFormErrors(['An unexpected error occurred. Please try again.']);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-blue-50 dark:from-primary/10 dark:via-background dark:to-blue-950/20">
@@ -255,104 +193,8 @@ export const Help = () => {
               </CardContent>
             </Card>
 
-            {/* Contact Form */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Still need help?</CardTitle>
-                <CardDescription>Send us a message and we'll get back to you</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Form Errors */}
-                {formErrors.length > 0 && (
-                  <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-4 h-4 text-destructive" />
-                      <span className="text-sm font-medium text-destructive">Please fix the following errors:</span>
-                    </div>
-                    <ul className="text-sm text-destructive space-y-1">
-                      {formErrors.map((error, index) => (
-                        <li key={index}>• {error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <form
-                  name="help-contact"
-                  data-netlify="true"
-                  data-netlify-honeypot="bot-field"
-                  onSubmit={handleContactSubmit}
-                  className="space-y-4"
-                >
-                  {/* Netlify Forms requires this hidden input */}
-                  <input type="hidden" name="form-name" value="help-contact" />
-
-                  {/* Honeypot field for spam protection */}
-                  <div style={{ display: 'none' }}>
-                    <label>
-                      Don't fill this out if you're human: <input name="bot-field" />
-                    </label>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="name" className="text-sm font-medium block mb-2">Name</label>
-                      <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                        required
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Enter your name"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="text-sm font-medium block mb-2">Email</label>
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                        required
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Enter your email"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="subject" className="text-sm font-medium block mb-2">Subject</label>
-                    <input
-                      id="subject"
-                      name="subject"
-                      type="text"
-                      value={contactForm.subject}
-                      onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
-                      required
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      placeholder="Enter subject"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="text-sm font-medium block mb-2">Message</label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                      rows={4}
-                      required
-                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      placeholder="Describe how we can help you..."
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            {/* Simple Contact Form that works with Netlify */}
+            <SimpleContactForm />
 
             {/* Debug Information (only show in development) */}
             {window.location.hostname === 'localhost' && <FormDebugInfo />}
