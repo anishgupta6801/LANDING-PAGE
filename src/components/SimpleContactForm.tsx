@@ -1,19 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
 
 export const SimpleContactForm: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true);
-    toast.success('Submitting your message...');
-
-    // Let the form submit naturally to Netlify
-    // The form will handle the submission and redirect
-  };
 
   return (
     <Card className="mt-6">
@@ -29,7 +19,6 @@ export const SimpleContactForm: React.FC = () => {
           action="/thank-you.html"
           data-netlify="true"
           data-netlify-honeypot="bot-field"
-          onSubmit={handleSubmit}
           className="space-y-4"
         >
           {/* Hidden fields for Netlify */}
@@ -104,9 +93,8 @@ export const SimpleContactForm: React.FC = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={isSubmitting}
           >
-            {isSubmitting ? 'Sending...' : 'Send Message'}
+            Send Message
           </Button>
         </form>
 
