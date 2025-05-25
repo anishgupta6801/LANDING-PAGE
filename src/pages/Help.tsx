@@ -87,12 +87,13 @@ export const Help = () => {
   );
 
   const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    // Don't prevent default for Netlify Forms - let it handle the submission
     setFormErrors([]);
 
-    // Validate form data
+    // Validate form data before submission
     const validation = validateContactForm(contactForm);
     if (!validation.isValid) {
+      e.preventDefault(); // Only prevent if validation fails
       setFormErrors(validation.errors);
       toast.error('Please fix the form errors before submitting.');
       return;
@@ -100,28 +101,11 @@ export const Help = () => {
 
     setIsSubmitting(true);
 
-    try {
-      const result = await submitContactForm(contactForm);
+    // Show loading state briefly, then let Netlify handle the redirect
+    toast.success('Sending your message...');
 
-      if (result.success) {
-        toast.success(result.message);
-        setContactForm({ name: '', email: '', subject: '', message: '' });
-        setFormErrors([]);
-
-        // Log submission for debugging
-        console.log('Contact form submitted successfully:', result.id);
-      } else {
-        toast.error(result.message);
-        if (result.error) {
-          console.error('Submission error:', result.error);
-        }
-      }
-    } catch (error) {
-      console.error('Unexpected error during form submission:', error);
-      toast.error('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Let the form submit naturally to Netlify
+    // Netlify will handle the submission and redirect to thank-you.html
   };
 
   return (
@@ -257,11 +241,29 @@ export const Help = () => {
                   </div>
                 )}
 
-                <form onSubmit={handleContactSubmit} className="space-y-4">
+                <form
+                  name="help-contact"
+                  method="POST"
+                  action="/thank-you.html"
+                  data-netlify="true"
+                  data-netlify-honeypot="bot-field"
+                  onSubmit={handleContactSubmit}
+                  className="space-y-4"
+                >
+                  {/* Netlify Forms requires this hidden input */}
+                  <input type="hidden" name="form-name" value="help-contact" />
+
+                  {/* Honeypot field for spam protection */}
+                  <div style={{ display: 'none' }}>
+                    <label>
+                      Don't fill this out if you're human: <input name="bot-field" />
+                    </label>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium">Name</label>
                       <Input
+                        name="name"
                         value={contactForm.name}
                         onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
                         required
@@ -270,6 +272,7 @@ export const Help = () => {
                     <div>
                       <label className="text-sm font-medium">Email</label>
                       <Input
+                        name="email"
                         type="email"
                         value={contactForm.email}
                         onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
@@ -280,6 +283,7 @@ export const Help = () => {
                   <div>
                     <label className="text-sm font-medium">Subject</label>
                     <Input
+                      name="subject"
                       value={contactForm.subject}
                       onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
                       required
@@ -288,6 +292,7 @@ export const Help = () => {
                   <div>
                     <label className="text-sm font-medium">Message</label>
                     <Textarea
+                      name="message"
                       value={contactForm.message}
                       onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
                       rows={4}
