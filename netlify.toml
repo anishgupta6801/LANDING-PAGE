@@ -6,8 +6,11 @@
   NODE_VERSION = "18"
 
 # Form handling configuration
-[[plugins]]
-  package = "@netlify/plugin-functions"
+[build.processing]
+  skip_processing = false
+
+[build.processing.forms]
+  skip_processing = false
 
 # Redirect rules
 [[redirects]]

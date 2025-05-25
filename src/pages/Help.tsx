@@ -87,13 +87,12 @@ export const Help = () => {
   );
 
   const handleContactSubmit = async (e: React.FormEvent) => {
-    // Don't prevent default for Netlify Forms - let it handle the submission
+    e.preventDefault();
     setFormErrors([]);
 
     // Validate form data before submission
     const validation = validateContactForm(contactForm);
     if (!validation.isValid) {
-      e.preventDefault(); // Only prevent if validation fails
       setFormErrors(validation.errors);
       toast.error('Please fix the form errors before submitting.');
       return;
@@ -101,11 +100,40 @@ export const Help = () => {
 
     setIsSubmitting(true);
 
-    // Show loading state briefly, then let Netlify handle the redirect
-    toast.success('Sending your message...');
+    try {
+      // Create FormData for Netlify Forms
+      const formData = new FormData();
+      formData.append('form-name', 'help-contact');
+      formData.append('name', contactForm.name);
+      formData.append('email', contactForm.email);
+      formData.append('subject', contactForm.subject);
+      formData.append('message', contactForm.message);
 
-    // Let the form submit naturally to Netlify
-    // Netlify will handle the submission and redirect to thank-you.html
+      // Submit to Netlify
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData as any).toString()
+      });
+
+      if (response.ok) {
+        toast.success('Message sent successfully! We\'ll get back to you soon.');
+        setContactForm({ name: '', email: '', subject: '', message: '' });
+        setFormErrors([]);
+
+        // Redirect to thank you page after a short delay
+        setTimeout(() => {
+          window.location.href = '/thank-you.html';
+        }, 1500);
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      toast.error('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -243,8 +271,6 @@ export const Help = () => {
 
                 <form
                   name="help-contact"
-                  method="POST"
-                  action="/thank-you.html"
                   data-netlify="true"
                   data-netlify-honeypot="bot-field"
                   onSubmit={handleContactSubmit}
@@ -261,42 +287,56 @@ export const Help = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium">Name</label>
-                      <Input
+                      <label htmlFor="name" className="text-sm font-medium block mb-2">Name</label>
+                      <input
+                        id="name"
                         name="name"
+                        type="text"
                         value={contactForm.name}
                         onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
                         required
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="Enter your name"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Email</label>
-                      <Input
+                      <label htmlFor="email" className="text-sm font-medium block mb-2">Email</label>
+                      <input
+                        id="email"
                         name="email"
                         type="email"
                         value={contactForm.email}
                         onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
                         required
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="Enter your email"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Subject</label>
-                    <Input
+                    <label htmlFor="subject" className="text-sm font-medium block mb-2">Subject</label>
+                    <input
+                      id="subject"
                       name="subject"
+                      type="text"
                       value={contactForm.subject}
                       onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
                       required
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Enter subject"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Message</label>
-                    <Textarea
+                    <label htmlFor="message" className="text-sm font-medium block mb-2">Message</label>
+                    <textarea
+                      id="message"
                       name="message"
                       value={contactForm.message}
                       onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
                       rows={4}
                       required
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Describe how we can help you..."
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
