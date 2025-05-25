@@ -10,7 +10,7 @@ export const SimpleContactForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
     toast.success('Submitting your message...');
-    
+
     // Let the form submit naturally to Netlify
     // The form will handle the submission and redirect
   };
@@ -23,22 +23,22 @@ export const SimpleContactForm: React.FC = () => {
       </CardHeader>
       <CardContent>
         {/* Simple HTML form that works with Netlify */}
-        <form 
-          name="help-contact" 
-          method="POST" 
+        <form
+          name="help-contact"
+          method="POST"
           action="/thank-you.html"
-          data-netlify="true" 
+          data-netlify="true"
           data-netlify-honeypot="bot-field"
           onSubmit={handleSubmit}
           className="space-y-4"
         >
           {/* Hidden fields for Netlify */}
           <input type="hidden" name="form-name" value="help-contact" />
-          
+
           {/* Honeypot field for spam protection */}
           <div className="hidden">
             <label>
-              Don't fill this out if you're human: 
+              Don't fill this out if you're human:
               <input name="bot-field" tabIndex={-1} autoComplete="off" />
             </label>
           </div>
@@ -57,7 +57,7 @@ export const SimpleContactForm: React.FC = () => {
                 placeholder="Your full name"
               />
             </div>
-            
+
             <div>
               <label htmlFor="email" className="text-sm font-medium block mb-2">
                 Email *
@@ -101,9 +101,9 @@ export const SimpleContactForm: React.FC = () => {
             />
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -114,13 +114,10 @@ export const SimpleContactForm: React.FC = () => {
           <div className="flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-blue-800 dark:text-blue-200">
-              <p className="font-medium">Form Submission Info:</p>
-              <ul className="mt-1 space-y-1 text-xs">
-                <li>• This form submits directly to Netlify</li>
-                <li>• You'll be redirected to a thank you page</li>
-                <li>• We typically respond within 24 hours</li>
-                <li>• All fields marked with * are required</li>
-              </ul>
+              <p className="font-medium">Response Time:</p>
+              <p className="mt-1 text-xs">
+                We typically respond to all inquiries within 24 hours. All fields marked with * are required.
+              </p>
             </div>
           </div>
         </div>

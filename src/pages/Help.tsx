@@ -15,7 +15,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-import { FormDebugInfo } from '../components/FormDebugInfo';
 import { SimpleContactForm } from '../components/SimpleContactForm';
 
 export const Help = () => {
@@ -195,9 +194,6 @@ export const Help = () => {
 
             {/* Simple Contact Form that works with Netlify */}
             <SimpleContactForm />
-
-            {/* Debug Information (only show in development) */}
-            {window.location.hostname === 'localhost' && <FormDebugInfo />}
           </div>
         </div>
       </div>
