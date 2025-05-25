@@ -9,6 +9,15 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Plus, Download, Share2, Palette } from 'lucide-react';
 import { toast } from 'sonner';
+import { ShareDialog } from './ShareDialog';
+import { downloadHTML } from '../lib/htmlExporter';
+
+const ColorPreview: React.FC<{ color: string }> = ({ color }) => (
+  <div
+    className="w-4 h-4 rounded-full border border-border"
+    style={{ backgroundColor: color }}
+  />
+);
 
 const colorPresets = [
   { name: 'Ocean', primary: '#0891B2', secondary: '#0E7490' },
@@ -18,20 +27,23 @@ const colorPresets = [
 ];
 
 export const EditorPanel = () => {
-  const { 
-    sections, 
-    theme, 
-    updateTheme, 
-    updateSections, 
+  const {
+    sections,
+    theme,
+    updateTheme,
+    updateSections,
     addCustomSection,
-    isGenerating 
+    isGenerating,
+    exportToHTML,
+    formData
   } = useStore();
 
   const [customSectionDescription, setCustomSectionDescription] = React.useState('');
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
 
   const handleAddCustomSection = async () => {
     if (!customSectionDescription.trim()) return;
-    
+
     await addCustomSection(customSectionDescription);
     setCustomSectionDescription('');
     toast.success('Custom section added!');
@@ -39,7 +51,7 @@ export const EditorPanel = () => {
 
   const toggleSectionVisibility = (sectionId: string) => {
     const updatedSections = sections.map(section =>
-      section.id === sectionId 
+      section.id === sectionId
         ? { ...section, isVisible: !section.isVisible }
         : section
     );
@@ -47,21 +59,36 @@ export const EditorPanel = () => {
   };
 
   const handleExport = () => {
-    toast.success('Export functionality would be implemented here');
+    try {
+      const html = exportToHTML();
+      const filename = `${formData.productName || 'landing-page'}.html`;
+      downloadHTML(html, filename);
+      toast.success('HTML file downloaded successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export HTML file');
+    }
   };
 
   const handleShare = () => {
-    toast.success('Share functionality would be implemented here');
+    setShareDialogOpen(true);
   };
 
   return (
-    <div className="w-80 border-l bg-background p-6 overflow-auto">
+    <div className="w-80 border-l bg-card/50 p-6 overflow-auto">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Customize</h2>
+        <p className="text-sm text-muted-foreground">
+          Adjust your page theme, colors, and content to match your brand.
+        </p>
+      </div>
+
       <div className="space-y-6">
         {/* Theme Controls */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="w-5 h-5" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Palette className="w-4 h-4" />
               Theme Settings
             </CardTitle>
           </CardHeader>
@@ -71,7 +98,7 @@ export const EditorPanel = () => {
               <Switch
                 id="dark-mode"
                 checked={theme.mode === 'dark'}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   updateTheme({ mode: checked ? 'dark' : 'light' })
                 }
               />
@@ -106,10 +133,7 @@ export const EditorPanel = () => {
                     onClick={() => updateTheme({ brandColor: preset.primary })}
                   >
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: preset.primary }}
-                      />
+                      <ColorPreview color={preset.primary} />
                       <span className="text-xs">{preset.name}</span>
                     </div>
                   </Button>
@@ -139,9 +163,9 @@ export const EditorPanel = () => {
 
         {/* Add Custom Section */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="w-5 h-5" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Plus className="w-4 h-4" />
               Add Section
             </CardTitle>
           </CardHeader>
@@ -152,7 +176,7 @@ export const EditorPanel = () => {
               onChange={(e) => setCustomSectionDescription(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAddCustomSection()}
             />
-            <Button 
+            <Button
               onClick={handleAddCustomSection}
               disabled={!customSectionDescription.trim() || isGenerating}
               className="w-full"
@@ -170,13 +194,18 @@ export const EditorPanel = () => {
             <Download className="w-4 h-4 mr-2" />
             Export HTML
           </Button>
-          
+
           <Button onClick={handleShare} className="w-full">
             <Share2 className="w-4 h-4 mr-2" />
             Share Page
           </Button>
         </div>
       </div>
+
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+      />
     </div>
   );
 };

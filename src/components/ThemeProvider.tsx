@@ -23,6 +23,13 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+
+    // Update document class for Tailwind CSS dark mode
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [isDarkMode]);
 
   const toggleTheme = () => {
@@ -33,8 +40,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
       <MUIThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
         <CssBaseline />
-        {children}
+        <div className={isDarkMode ? 'dark' : ''}>
+          {children}
+        </div>
       </MUIThemeProvider>
     </ThemeContext.Provider>
   );
-}; 
+};

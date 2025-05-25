@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 
+
 const steps = [
   {
     title: 'Product Basics',
@@ -42,13 +43,13 @@ const tones = [
 ];
 
 export const MultiStepForm = () => {
-  const { 
-    currentStep, 
-    formData, 
+  const {
+    currentStep,
+    formData,
     isGenerating,
-    setCurrentStep, 
-    updateFormData, 
-    generateContent 
+    setCurrentStep,
+    updateFormData,
+    generateContent
   } = useStore();
 
   const [features, setFeatures] = React.useState<string[]>(formData.keyFeatures || []);
@@ -101,13 +102,14 @@ export const MultiStepForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           {steps.map((step, index) => (
             <div key={index} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                index <= currentStep 
-                  ? 'bg-primary text-primary-foreground' 
+                index <= currentStep
+                  ? 'bg-primary text-primary-foreground'
                   : 'bg-muted text-muted-foreground'
               }`}>
                 {index + 1}
@@ -124,7 +126,7 @@ export const MultiStepForm = () => {
         <p className="text-muted-foreground">{steps[currentStep]?.description}</p>
       </div>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardContent className="p-6">
           {currentStep === 0 && (
             <div className="space-y-6">
@@ -137,7 +139,7 @@ export const MultiStepForm = () => {
                   placeholder="Enter your product or company name"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="industry">Industry *</Label>
                 <Select

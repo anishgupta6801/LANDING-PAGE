@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Zap, Palette, Layout, ArrowRight, Github, Star } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Sparkles, Zap, Palette, Layout, ArrowRight, Star, BookOpen, Info, HelpCircle } from 'lucide-react';
 
 const features = [
   {
@@ -33,25 +34,38 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-purple-50 dark:from-primary/10 dark:via-background dark:to-purple-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-blue-50 dark:from-primary/10 dark:via-background dark:to-blue-950/20">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-background/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold">Landing Page Generator</span>
+            <span className="text-xl font-bold">LANDING PAGE GENERATOR</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Badge variant="secondary" className="gap-1">
               <Star className="w-3 h-3" />
-              AI Powered
+              Template Based
             </Badge>
-            <Button variant="outline" size="sm">
-              <Github className="w-4 h-4 mr-2" />
-              GitHub
-            </Button>
+
+            <div className="hidden md:flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/docs')}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                Documentation
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/about')}>
+                <Info className="w-4 h-4 mr-2" />
+                About
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/help')}>
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Help
+              </Button>
+            </div>
+
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -59,18 +73,18 @@ const Index = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
-            Build Landing Pages with AI
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+            BUILD LANDING PAGES WITH AI
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Transform your ideas into beautiful, responsive landing pages in minutes. 
+            Transform your ideas into beautiful, responsive landing pages in minutes.
             Just describe your product and watch AI create a complete website for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={() => navigate('/generator')}
-              className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+              className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
             >
               Start Building
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -90,7 +104,7 @@ const Index = () => {
             Everything you need to create professional landing pages with the power of AI
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
@@ -116,7 +130,7 @@ const Index = () => {
             Three simple steps to your perfect landing page
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
@@ -153,12 +167,12 @@ const Index = () => {
             Ready to Build Your Landing Page?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of creators who trust our AI to build their web presence
+            Join thousands of creators who trust our templates to build their web presence
           </p>
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             onClick={() => navigate('/generator')}
-            className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+            className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
           >
             Get Started for Free
             <Sparkles className="w-5 h-5 ml-2" />
@@ -171,10 +185,10 @@ const Index = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-gradient-to-br from-primary to-purple-600 rounded flex items-center justify-center">
+              <div className="w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <span className="font-semibold">Landing Page Generator</span>
+              <span className="font-semibold">LANDING PAGE GENERATOR</span>
             </div>
             <div className="text-sm text-muted-foreground">
               Built with ❤️ using React, Tailwind CSS, and AI
