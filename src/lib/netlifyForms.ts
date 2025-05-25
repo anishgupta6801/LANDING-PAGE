@@ -15,12 +15,19 @@ export interface FormSubmissionResult {
 // Check if we're running in production (deployed on Netlify)
 const isProduction = () => {
   if (typeof window === 'undefined') return false;
-  
+
   const hostname = window.location.hostname;
-  return hostname !== 'localhost' && 
-         hostname !== '127.0.0.1' && 
+  return hostname !== 'localhost' &&
+         hostname !== '127.0.0.1' &&
          hostname !== '0.0.0.0' &&
          !hostname.includes('localhost');
+};
+
+// Check if we can attempt real form submission
+const canSubmitToNetlify = () => {
+  // Always try real submission, even in development
+  // This allows testing the actual Netlify integration
+  return true;
 };
 
 // Submit form to Netlify Forms
@@ -29,23 +36,11 @@ export const submitToNetlifyForms = async (
   formName: string = 'help-contact'
 ): Promise<FormSubmissionResult> => {
   try {
-    if (!isProduction()) {
-      // Development mode - simulate submission
-      console.log('🔧 Development mode: Simulating Netlify form submission');
-      console.log('Form data:', formData);
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      return {
-        success: true,
-        message: 'Message sent successfully! (Development mode - form would be submitted to Netlify in production)'
-      };
-    }
+    // Always attempt real submission to Netlify
+    console.log('🚀 Attempting to submit to Netlify Forms');
+    console.log('Environment:', isProduction() ? 'Production' : 'Development');
+    console.log('Form data:', formData);
 
-    // Production mode - actual Netlify submission
-    console.log('🚀 Production mode: Submitting to Netlify Forms');
-    
     // Create form data in the format Netlify expects
     const params = new URLSearchParams();
     params.append('form-name', formName);
@@ -76,7 +71,7 @@ export const submitToNetlifyForms = async (
     } else {
       const responseText = await response.text();
       console.error('❌ Form submission failed:', response.status, responseText);
-      
+
       return {
         success: false,
         message: 'Failed to send message. Please try again.',
@@ -86,7 +81,7 @@ export const submitToNetlifyForms = async (
 
   } catch (error) {
     console.error('❌ Form submission error:', error);
-    
+
     return {
       success: false,
       message: 'Failed to send message. Please check your connection and try again.',
@@ -101,9 +96,7 @@ export const submitToNetlifyFormsAlt = async (
   formName: string = 'help-contact'
 ): Promise<FormSubmissionResult> => {
   try {
-    if (!isProduction()) {
-      return submitToNetlifyForms(formData, formName);
-    }
+    console.log('🔄 Trying alternative submission method');
 
     // Alternative method: Submit as FormData
     const form = new FormData();

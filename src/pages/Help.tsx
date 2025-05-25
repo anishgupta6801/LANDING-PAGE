@@ -107,8 +107,8 @@ export const Help = () => {
       console.log('🚀 Attempting form submission...');
       let result = await submitToNetlifyForms(contactForm);
 
-      // If primary method fails in production, try alternative method
-      if (!result.success && window.location.hostname !== 'localhost') {
+      // If primary method fails, try alternative method
+      if (!result.success) {
         console.log('🔄 Primary method failed, trying alternative...');
         result = await submitToNetlifyFormsAlt(contactForm);
       }
@@ -118,12 +118,10 @@ export const Help = () => {
         setContactForm({ name: '', email: '', subject: '', message: '' });
         setFormErrors([]);
 
-        // Redirect to thank you page after a short delay (only in production)
-        if (window.location.hostname !== 'localhost') {
-          setTimeout(() => {
-            window.location.href = '/thank-you.html';
-          }, 1500);
-        }
+        // Redirect to thank you page after a short delay
+        setTimeout(() => {
+          window.location.href = '/thank-you.html';
+        }, 1500);
       } else {
         console.error('❌ Form submission failed:', result.error);
         toast.error(result.message);

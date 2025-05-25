@@ -27,12 +27,12 @@ export const FormDebugInfo: React.FC = () => {
             <span className="ml-2 font-mono">{hostname}</span>
           </div>
         </div>
-        
+
         <div>
           <span className="font-medium">Current URL:</span>
           <div className="font-mono text-xs break-all">{currentUrl}</div>
         </div>
-        
+
         <div className="pt-2 border-t border-orange-200">
           <div className="text-orange-700 dark:text-orange-300">
             {isProduction ? (
@@ -41,19 +41,20 @@ export const FormDebugInfo: React.FC = () => {
               </>
             ) : (
               <>
-                🔧 <strong>Development Mode:</strong> Forms will be simulated (not actually sent)
+                🔧 <strong>Development Mode:</strong> Forms will attempt real submission to Netlify
               </>
             )}
           </div>
         </div>
-        
+
         <div className="pt-2 text-orange-600 dark:text-orange-400">
           <strong>Troubleshooting:</strong>
           <ul className="list-disc list-inside mt-1 space-y-1">
             <li>Check browser console for detailed logs</li>
             <li>Verify Netlify Forms are enabled in dashboard</li>
             <li>Ensure form name "help-contact" is detected</li>
-            {!isProduction && <li>Deploy to production to test actual submission</li>}
+            <li>Form will attempt real submission in all environments</li>
+            {!isProduction && <li>Local submissions may fail if not deployed to Netlify</li>}
           </ul>
         </div>
       </CardContent>
