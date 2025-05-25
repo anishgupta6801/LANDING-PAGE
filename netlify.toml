@@ -12,6 +12,13 @@
 [build.processing.forms]
   skip_processing = false
 
+# Explicit form configuration
+[[forms]]
+  name = "help-contact"
+
+[[forms]]
+  name = "contact"
+
 # Redirect rules
 [[redirects]]
   from = "/api/*"

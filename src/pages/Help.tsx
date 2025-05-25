@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { submitContactForm, validateContactForm } from '../lib/contactStorage';
-import { submitToNetlifyForms, submitToNetlifyFormsAlt, validateFormData, type ContactFormData } from '../lib/netlifyForms';
+import { submitToNetlifyForms, submitToNetlifyFormsAlt, submitViaDirectForm, validateFormData, type ContactFormData } from '../lib/netlifyForms';
 import { FormDebugInfo } from '../components/FormDebugInfo';
 
 export const Help = () => {
@@ -103,14 +103,20 @@ export const Help = () => {
     setIsSubmitting(true);
 
     try {
-      // Try primary submission method
-      console.log('🚀 Attempting form submission...');
+      // Try multiple submission methods in sequence
+      console.log('🚀 Attempting form submission with multiple methods...');
       let result = await submitToNetlifyForms(contactForm);
 
-      // If primary method fails, try alternative method
+      // If primary method fails, try FormData method
       if (!result.success) {
-        console.log('🔄 Primary method failed, trying alternative...');
+        console.log('🔄 Method 1 failed, trying FormData method...');
         result = await submitToNetlifyFormsAlt(contactForm);
+      }
+
+      // If FormData method fails, try direct form submission
+      if (!result.success) {
+        console.log('🔄 Method 2 failed, trying direct form submission...');
+        result = await submitViaDirectForm(contactForm);
       }
 
       if (result.success) {
